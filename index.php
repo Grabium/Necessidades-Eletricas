@@ -101,6 +101,7 @@ class Matriz
   public array $coordenadasFE;
   public array $celulasIdentificadas;
   public array $linhasOcupadasEQuantidade;
+  public array $coordenadasOcupadasTotal;
 
   public function __construct(array $metaDadosMatrizArray, array $coordenadasFEArray)
   {
@@ -171,6 +172,7 @@ class Matriz
 
   private function inserirEmLinhasOcupadasEQuantidade(array $coordenada)
   {
+    $this->coordenadasOcupadasTotal[] = $coordenada;
     $this->linhasOcupadasEQuantidade[] = $coordenada[0];
   }
   
@@ -273,7 +275,7 @@ class Query
   
   private function imprimirResposta(array $coordenada)
   {
-    echo $coordenada[0].' '.$coordenada[1].PHP_EOL;
+    echo 'RESULTADO: '.$coordenada[0].' '.$coordenada[1].PHP_EOL.PHP_EOL;
   }
   
   private function localizarNumaMatrizComoPadrao($idABuscar)
@@ -294,7 +296,7 @@ class Query
     //método 2 - se for após ou igual à última célula de prioridade.
     //método 3 - buscar ordem e dividir e considerar o resto da divisão. Buscar nas linhas, as células livres.
     foreach($this->idABuscarArray as $idABuscar){
-      
+      echo 'Buacando ID: '.$idABuscar.PHP_EOL;
       //caso já esteja indexado com célula de prioridade.
       if(isset($this->matriz->celulasIdentificadas[$idABuscar])){
         echo $idABuscar. ' - Metodo 1.'.PHP_EOL;
@@ -321,7 +323,7 @@ class Query
       $linhasLivres = (min(array_keys($this->matriz->linhasOcupadasEQuantidade)) -1);
       
       
-      //menor celula prioridade
+      //menor celula prioridade mudar isso para fora do loop
       foreach($this->matriz->celulasIdentificadas as $k => $celulaAtual){
         if($k == 1){
           $menorPrioridade = $celulaAtual[0].$celulaAtual[1];
@@ -346,6 +348,7 @@ class Query
         continue;
       }
       
+      //entre linhas consumidas pela prioridade e FE.
       echo'localizado na zona de consumo.'.PHP_EOL;
       //quantidade de linhas livres
       $quantidadeDeLinhasLivresNaZonaAnterior =  ($menorPrioridade[0]-1);
@@ -365,8 +368,42 @@ class Query
         if($celulasAConsumirAteAID <=1){
           echo  'Achou: '.$celulasAConsumirAteAID.PHP_EOL;
           //se achou ==1, setar a linha e a primeira célula.
+          $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem = $celulasLivresNestaLinhaAtual + $celulasAConsumirAteAID;
+          echo 'A coluna será a '.$quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem.'ª célula livre desta linha.'.PHP_EOL;
+          //$coluna = ($this->matriz->quantidadeColunas + $celulasAConsumirAteAID);
+          //$coordenada = [$linhaAtual, $coluna];
+          //$this->imprimirResposta($coordenada);
+          //var_dump($this->matriz->coordenadasOcupadasTotal);
+          $colunasOcupadasNestaLinha = [];
+          foreach($this->matriz->coordenadasOcupadasTotal as $coordenadaOcupada){
+            if($coordenadaOcupada[0] != $linhaAtual){
+              continue;
+            }
+            
+            $colunasOcupadasNestaLinha[] = $coordenadaOcupada[1];
+          }
           
-          die();
+          var_dump($quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem);
+          
+          //se coluna buscada está antes da primeira coluna consumida
+          if(min($colunasOcupadasNestaLinha) > 1){
+            $coluna = $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem;
+          }
+          
+          //se coluna buscada está depois da última coluna consumida
+          if(max($colunasOcupadasNestaLinha) < $this->matriz->quantidadeColunas){
+            $coluna = (max($colunasOcupadasNestaLinha) + $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem);
+          }
+          
+          
+          
+          //pode haver um caso em que as FE estejam separadas e possibilite a busca entre células livres entre elas
+          //caso não implementado...
+          //seguindo em frente...
+          $coordenada = [$linhaAtual, $coluna];
+          $this->imprimirResposta($coordenada);
+          //die();
+          break;
         }
         
         $linhaAtual++;
@@ -383,6 +420,12 @@ class Query
   {
     $localizacaoPadrao = $this->localizarNumaMatrizComoPadrao(($idABuscar + $this->matriz->quantidadeFE));
     $ultimaPrioridade = $this->matriz->celulasIdentificadas[count($this->matriz->celulasIdentificadas)];
+    
+    //quando a coluna é 10 ($localizacaoPadrao[1] == 10)
+    if($localizacaoPadrao[1] == 10){
+      $localizacaoPadrao[1] = 0;
+      $localizacaoPadrao[0] = ($localizacaoPadrao[0]+1);
+    }
     
     //stringficação
     $localizacaoPadrao = $localizacaoPadrao[0].$localizacaoPadrao[1];
@@ -402,5 +445,4 @@ class Query
   
 
 }
-
 

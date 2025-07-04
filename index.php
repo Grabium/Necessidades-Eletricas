@@ -13,7 +13,7 @@ function testTime(bool $fimDoScript = false)
     // 3. Calcula o tempo decorrido.
     $tempo_decorrido = ($tempo_fim - $tempo_inicio);
     
-    echo "Tempo de execução do script: " . round($tempo_decorrido, 4) . " segundos.\n";
+    //echo "Tempo de execução do script: " . round($tempo_decorrido, 4) . " segundos.\n";
   }
   
 }
@@ -275,7 +275,7 @@ class Query
   
   private function imprimirResposta(array $coordenada)
   {
-    echo 'RESULTADO: '.$coordenada[0].' '.$coordenada[1].PHP_EOL.PHP_EOL;
+    echo $coordenada[0].' '.$coordenada[1].PHP_EOL.PHP_EOL;
   }
   
   private function localizarNumaMatrizComoPadrao($idABuscar)
@@ -296,30 +296,31 @@ class Query
     //método 2 - se for após ou igual à última célula de prioridade.
     //método 3 - buscar ordem e dividir e considerar o resto da divisão. Buscar nas linhas, as células livres.
     foreach($this->idABuscarArray as $idABuscar){
-      echo 'Buacando ID: '.$idABuscar.PHP_EOL;
+      //echo 'Buscando ID: '.$idABuscar.PHP_EOL;
+      //echo 'Buscando ID: '.$idABuscar.'. ';
       //caso já esteja indexado com célula de prioridade.
       if(isset($this->matriz->celulasIdentificadas[$idABuscar])){
-        echo $idABuscar. ' - Metodo 1.'.PHP_EOL;
+        //echo $idABuscar. ' - Metodo 1.'.PHP_EOL;
         $this->imprimirResposta($this->matriz->celulasIdentificadas[$idABuscar]);
         continue;
       }
       
       //caso deva estar em uma célula APÓS TODAs as células de prioridade
       if($this->seBuscadoEAposCelulasIdentificadas($idABuscar)){
-        echo $idABuscar. ' - Metodo 2.'.PHP_EOL;
+        //echo $idABuscar. ' - Metodo 2.'.PHP_EOL;
         $coordenada = $this->localizarNumaMatrizComoPadrao($idABuscar + $this->matriz->quantidadeFE);
         $this->imprimirResposta($coordenada);
         continue;
       }
 
-      echo $idABuscar. ' - Metodo 3.'.PHP_EOL;
+      //echo $idABuscar. ' - Metodo 3.'.PHP_EOL;
 
       $celulasAConsumirAteAID = ($idABuscar - count($this->matriz->celulasIdentificadas));
-      echo 'celulas a consumir: '.$celulasAConsumirAteAID.PHP_EOL;//die();
+      //echo 'celulas a consumir: '.$celulasAConsumirAteAID.PHP_EOL;//die();
       $saltoDeLinhas = intdiv($celulasAConsumirAteAID, $this->matriz->quantidadeColunas);
-      echo 'salto de linhas: '.$saltoDeLinhas.PHP_EOL;//die();
+      //echo 'salto de linhas: '.$saltoDeLinhas.PHP_EOL;//die();
       $resto = ($celulasAConsumirAteAID % $this->matriz->quantidadeColunas);
-      echo 'resto: '.$resto.PHP_EOL;//die();
+      //echo 'resto: '.$resto.PHP_EOL;//die();
       $linhasLivres = (min(array_keys($this->matriz->linhasOcupadasEQuantidade)) -1);
       
       
@@ -338,7 +339,7 @@ class Query
       //se antes da menor celula prioridade
       if(($menorPrioridade - 11)>= $celulasAConsumirAteAID){
         
-        echo 'dentro das linhas antes de alterações.'.PHP_EOL;
+        //echo 'dentro das linhas antes de alterações.'.PHP_EOL;
         if($resto != 0){
           $coordenada = [$saltoDeLinhas +1, $resto];
         }else{
@@ -349,31 +350,32 @@ class Query
       }
       
       //entre linhas consumidas pela prioridade e FE.
-      echo'localizado na zona de consumo.'.PHP_EOL;
+      //echo'localizado na zona de consumo.'.PHP_EOL;
       //quantidade de linhas livres
       $quantidadeDeLinhasLivresNaZonaAnterior =  ($menorPrioridade[0]-1);
       $celulasAConsumirAteAID  = $celulasAConsumirAteAID - ($quantidadeDeLinhasLivresNaZonaAnterior * $this->matriz->quantidadeColunas);
-      echo 'celulas a consumir na zona de consumo: '.$celulasAConsumirAteAID.PHP_EOL;
+      //echo 'celulas a consumir na zona de consumo: '.$celulasAConsumirAteAID.PHP_EOL;
       $linhaAtual = $menorPrioridade[0];
       
-      echo 'Iterando: '.PHP_EOL.PHP_EOL.PHP_EOL;
+      //echo 'Iterando: '.PHP_EOL.PHP_EOL.PHP_EOL;
       //loop
       while(true){
-        echo PHP_EOL.'Linha: '.$linhaAtual.PHP_EOL;
+        //echo PHP_EOL.'Linha: '.$linhaAtual.PHP_EOL;
         $celulasLivresNestaLinhaAtual = ($this->matriz->quantidadeColunas - $this->matriz->linhasOcupadasEQuantidade[$linhaAtual]);
-        echo 'celulas livres nesta linha: '.$celulasLivresNestaLinhaAtual.PHP_EOL;
+        //echo 'celulas livres nesta linha: '.$celulasLivresNestaLinhaAtual.PHP_EOL;
+        //echo 'Consumindo...'.PHP_EOL;
         $celulasAConsumirAteAID = ($celulasAConsumirAteAID - $celulasLivresNestaLinhaAtual);
-        echo 'Consumindo...'.PHP_EOL.'restam ' . $celulasAConsumirAteAID . ' células.'.PHP_EOL;
+        //echo 'Falta consumir ' . $celulasAConsumirAteAID . ' célula(s).'.PHP_EOL;
         
-        if($celulasAConsumirAteAID <=1){
-          echo  'Achou: '.$celulasAConsumirAteAID.PHP_EOL;
+        if($celulasAConsumirAteAID <1){
+          //echo  'Achou: '.$celulasAConsumirAteAID.PHP_EOL;
           //se achou ==1, setar a linha e a primeira célula.
           $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem = $celulasLivresNestaLinhaAtual + $celulasAConsumirAteAID;
-          echo 'A coluna será a '.$quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem.'ª célula livre desta linha.'.PHP_EOL;
+          //echo 'A coluna será a '.$quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem.'ª célula livre desta linha.'.PHP_EOL;
           //$coluna = ($this->matriz->quantidadeColunas + $celulasAConsumirAteAID);
           //$coordenada = [$linhaAtual, $coluna];
           //$this->imprimirResposta($coordenada);
-          //var_dump($this->matriz->coordenadasOcupadasTotal);
+          //////var_dump($this->matriz->coordenadasOcupadasTotal);
           $colunasOcupadasNestaLinha = [];
           foreach($this->matriz->coordenadasOcupadasTotal as $coordenadaOcupada){
             if($coordenadaOcupada[0] != $linhaAtual){
@@ -383,15 +385,14 @@ class Query
             $colunasOcupadasNestaLinha[] = $coordenadaOcupada[1];
           }
           
-          var_dump($quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem);
+          ////var_dump($quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem);
           
-          //se coluna buscada está antes da primeira coluna consumida
+          
           if(min($colunasOcupadasNestaLinha) > 1){
+            //echo 'A coluna buscada está antes da primeira coluna consumida'.PHP_EOL;
             $coluna = $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem;
-          }
-          
-          //se coluna buscada está depois da última coluna consumida
-          if(max($colunasOcupadasNestaLinha) < $this->matriz->quantidadeColunas){
+          }elseif(max($colunasOcupadasNestaLinha) < $this->matriz->quantidadeColunas){
+            //echo 'A coluna buscada está depois da última coluna consumida.'.PHP_EOL;
             $coluna = (max($colunasOcupadasNestaLinha) + $quantidadeDeCelulaLivreNestaLinhaQueSeraColunaPelaOrdem);
           }
           
@@ -411,7 +412,7 @@ class Query
       
     }
 
-    echo '-'.PHP_EOL;
+    //echo '-'.PHP_EOL;
   }
 
 
@@ -433,7 +434,7 @@ class Query
     $ultimaPrioridade = $ultimaPrioridade[0].$ultimaPrioridade[1];
     $ultimaPrioridade = (int)$ultimaPrioridade;
     
-    echo 'padrão: '.$localizacaoPadrao.' - ultima prioridade: '.$ultimaPrioridade.PHP_EOL;
+    //echo 'padrão: '.$localizacaoPadrao.' - ultima prioridade: '.$ultimaPrioridade.PHP_EOL;
     //true se vuscado for depois
     if($localizacaoPadrao <= $ultimaPrioridade){
       return false;
@@ -445,4 +446,3 @@ class Query
   
 
 }
-
